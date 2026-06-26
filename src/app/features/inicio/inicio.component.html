@@ -1,0 +1,22 @@
+<section class="welcome" aria-labelledby="welcome-title">
+  <div class="welcome-card">
+    <p class="welcome-badge">Programación · Uniandes</p>
+    <h1 id="welcome-title">Sistema de Docentes</h1>
+    <p class="welcome-message">
+      Hola, <strong>{{ authStore.nombreUsuario() }}</strong>.
+      Has iniciado sesión correctamente como
+      <span class="role-tag">{{ authStore.rol() }}</span>.
+    </p>
+    <p class="welcome-sub">
+      Desde aquí puedes gestionar los docentes y los usuarios del sistema.
+    </p>
+
+    <div class="welcome-actions">
+      <a routerLink="/docentes" class="btn btn-primary">Ir a docentes</a>
+      <a routerLink="/usuarios" class="btn btn-secondary">Ir a usuarios</a>
+      <button type="button" class="btn btn-secondary" (click)="logout()">
+        Cerrar sesión
+      </button>
+    </div>
+  </div>
+</section>

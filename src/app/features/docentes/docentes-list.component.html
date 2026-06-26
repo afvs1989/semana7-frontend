@@ -1,0 +1,117 @@
+<section aria-labelledby="docentes-title">
+  <header class="page-header">
+    <div>
+      <a routerLink="/inicio" class="back-link">← Inicio</a>
+      <h1 id="docentes-title">Docentes</h1>
+      <p class="subtitle">
+        Sesión: {{ authStore.nombreUsuario() }} ({{ authStore.rol() }})
+      </p>
+    </div>
+    <div class="actions">
+      @if (authStore.esAdministrador()) {
+        <a routerLink="/docentes/nuevo" class="btn btn-primary">Nuevo docente</a>
+      }
+      <button type="button" class="btn btn-secondary" (click)="logout()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <div class="export-bar">
+    <span class="export-label">Exportar listado:</span>
+    <button
+      type="button"
+      class="btn btn-export"
+      (click)="exportarCsv()"
+      [disabled]="docenteStore.lista().length === 0"
+    >
+      CSV
+    </button>
+    <button
+      type="button"
+      class="btn btn-export"
+      (click)="exportarExcel()"
+      [disabled]="docenteStore.lista().length === 0"
+    >
+      Excel
+    </button>
+    <button
+      type="button"
+      class="btn btn-export"
+      (click)="exportarPdf()"
+      [disabled]="docenteStore.lista().length === 0"
+    >
+      PDF
+    </button>
+  </div>
+
+  @if (docenteStore.mensajeActual(); as mensaje) {
+    <p class="alert alert-success" role="status">{{ mensaje }}</p>
+  }
+
+  @if (docenteStore.errorActual(); as error) {
+    <p class="alert alert-error" role="alert">{{ error }}</p>
+  }
+
+  @if (docenteStore.estaCargando()) {
+    <p role="status">Cargando docentes...</p>
+  } @else {
+    <div class="table-wrapper" tabindex="0" aria-label="Tabla de docentes">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Nombres</th>
+            <th scope="col">Apellidos</th>
+            <th scope="col">Documento</th>
+            <th scope="col">Email</th>
+            <th scope="col">Teléfono</th>
+            <th scope="col">Departamento</th>
+            <th scope="col">Título</th>
+            <th scope="col">Contratación</th>
+            <th scope="col">Salario</th>
+            <th scope="col">Estado</th>
+            @if (authStore.esAdministrador()) {
+              <th scope="col">Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (docente of docenteStore.lista(); track docente.id) {
+            <tr>
+              <td>{{ docente.nombres }}</td>
+              <td>{{ docente.apellidos }}</td>
+              <td>{{ docente.documento }}</td>
+              <td>{{ docente.email }}</td>
+              <td>{{ docente.telefono }}</td>
+              <td>{{ docente.departamento }}</td>
+              <td>{{ docente.tituloAcademico }}</td>
+              <td>{{ docente.fechaContratacion }}</td>
+              <td>{{ docente.salario | number: '1.0-0' }}</td>
+              <td>
+                <span class="badge" [class.badge-inactive]="!docente.activo">
+                  {{ docente.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              @if (authStore.esAdministrador()) {
+                <td class="row-actions">
+                  <a [routerLink]="['/docentes', docente.id, 'editar']">Editar</a>
+                  <button
+                    type="button"
+                    (click)="eliminar(docente.id)"
+                    [disabled]="eliminandoId() === docente.id"
+                  >
+                    {{ eliminandoId() === docente.id ? 'Eliminando...' : 'Eliminar' }}
+                  </button>
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr>
+              <td [attr.colspan]="authStore.esAdministrador() ? 11 : 10">
+                No hay docentes registrados.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

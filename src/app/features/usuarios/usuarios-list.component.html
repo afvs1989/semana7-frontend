@@ -1,0 +1,75 @@
+<section aria-labelledby="usuarios-title">
+  <header class="page-header">
+    <div>
+      <a routerLink="/inicio" class="back-link">← Inicio</a>
+      <h1 id="usuarios-title">Usuarios</h1>
+      <p class="subtitle">
+        Sesión: {{ authStore.nombreUsuario() }} ({{ authStore.rol() }})
+      </p>
+    </div>
+    <div class="actions">
+      @if (authStore.esAdministrador()) {
+        <a routerLink="/usuarios/nuevo" class="btn btn-primary">Nuevo usuario</a>
+      }
+      <button type="button" class="btn btn-secondary" (click)="logout()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  @if (usuarioStore.mensajeActual(); as mensaje) {
+    <p class="alert alert-success" role="status">{{ mensaje }}</p>
+  }
+
+  @if (usuarioStore.errorActual(); as error) {
+    <p class="alert alert-error" role="alert">{{ error }}</p>
+  }
+
+  @if (usuarioStore.estaCargando()) {
+    <p role="status">Cargando usuarios...</p>
+  } @else {
+    <div class="table-wrapper" tabindex="0" aria-label="Tabla de usuarios">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Usuario</th>
+            <th scope="col">Rol</th>
+            <th scope="col">Estado</th>
+            @if (authStore.esAdministrador()) {
+              <th scope="col">Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (usuario of usuarioStore.lista(); track usuario.id) {
+            <tr>
+              <td>{{ usuario.nombreUsuario }}</td>
+              <td><span class="badge">{{ usuario.rol }}</span></td>
+              <td>
+                <span class="badge" [class.badge-inactive]="!usuario.activo">
+                  {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              @if (authStore.esAdministrador()) {
+                <td class="row-actions">
+                  <a [routerLink]="['/usuarios', usuario.id, 'editar']">Editar</a>
+                  <button
+                    type="button"
+                    (click)="eliminar(usuario.id)"
+                    [disabled]="eliminandoId() === usuario.id"
+                  >
+                    {{ eliminandoId() === usuario.id ? 'Eliminando...' : 'Eliminar' }}
+                  </button>
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr>
+              <td [attr.colspan]="authStore.esAdministrador() ? 4 : 3">
+                No hay usuarios registrados.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
